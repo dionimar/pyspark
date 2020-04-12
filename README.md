@@ -31,10 +31,19 @@ url | scheme | netloc | path | parameters | query | fragment
 http://www.example.com/about_us | http | www.example.com | /about_us | | | 
 https://www.example.com/page=1 | https | www.example.com | /page=1 | | |
 
-Then we can choose *netloc* as domain to restrict graph scope:
-* scrape_in
-* scrape_out
-* scrape_all
+Then we can choose *netloc* as domain to restrict graph scope, which is  done in scrape_ functions:
+```python
+def scrape_in_(netloc, url):
+'''
+Random sleep for distribute requests over time (avoid DDoS)
+Take care of table size: more registers requires more time (increase __ELASTIC_FACTOR)
+'''
+  time.sleep(random.random() * __ELASTIC_FACTOR
+  content = requests.get(url)                                      # Get html code from url
+  content = BeautifulSoup(content.text, 'lxml')                    # Parse html content. Tree representation from labels.
+  hrefs = [href['href'] for href in content.find_all(href = True)] # List of all href labels
+  return list(set([href for href in hrefs if netloc in href]))     # Returns the minimal list of hrefs which contains its domain
+```
 
 
 # Main functionality
