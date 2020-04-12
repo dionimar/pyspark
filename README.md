@@ -16,13 +16,20 @@ We are going to construct a table with the next structure:
 
 url | href
 ----|-----
-www.example.com | www.example.com/page=1
-www.example.com | www.example.com/about_us
+https://www.example.com | https://www.example.com/page=1
+https://www.example.com | http://www.example.com/about_us
 ...             | ...
 
 Then we have pairs 
-* (www.example.com, www.example.com/page=1)
-* (www.example.com, www.example.com/about_us)
+* (https://www.example.com, https://www.example.com/page=1)
+* (https://www.example.com, http://www.example.com/about_us)
 * ...
 
 which can be seen as edges in a graph.
+
+Meanwhile we are going to track each url info and store it in a table:
+
+url | scheme | netloc | path | parameters | query | fragment
+----|--------|--------|------|------------|-------|---------
+http://www.example.com/about_us | http | www.example.com | /about_us | | | 
+https://www.example.com/page=1 | https | www.example.com | /page=1 | | |
