@@ -21,7 +21,8 @@ www.example.com | www.example.com/about_us
 ...             | ...
 
 Then we have pairs 
-(www.example.com, www.example.com/page=1),
-(www.example.com, www.example.com/about_us), ...
+* (www.example.com, www.example.com/page=1)
+* (www.example.com, www.example.com/about_us)
+* ...
 
 which can be seen as edges in a graph.
