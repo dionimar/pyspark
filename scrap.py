@@ -178,15 +178,15 @@ def acquire_data(spark, seedlist, filename_out):
 if __name__ == '__main__':
     with SparkSession.builder.master('local[4]').getOrCreate() as spark:
         
-        master, master_info = acquire_data(
-            spark,
-            seedlist = 'urls.json',
-            filename_out = 'master'
-        )
+        # master, master_info = acquire_data(
+        #     spark,
+        #     seedlist = 'urls.json',
+        #     filename_out = 'master'
+        # )
 
         ## In case you saved the data, read it:
-        # master = spark.read.json('master')
-        # master_info = spark.read.json('master_info')
+        master = spark.read.json('master')
+        master_info = spark.read.json('master_info')
 
 
         # Create nodes and edges from url and href columns
@@ -237,12 +237,12 @@ if __name__ == '__main__':
         nx.draw_spring(
             G,
             with_labels = True,
-            node_size = 10,
-            font_size = 5,
-            labels = node_info,
-            edge_color = 'gray',
-            style = 'dashed',
-            width = 0.1,
-            node_color = list(colors)
+            node_size   = 10,
+            font_size   = 5,
+            labels      = node_info,
+            edge_color  = 'gray',
+            style       = 'dashed',
+            width       = 0.1,
+            node_color  = list(colors)
         )
         plt.show()
