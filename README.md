@@ -33,3 +33,8 @@ url | scheme | netloc | path | parameters | query | fragment
 ----|--------|--------|------|------------|-------|---------
 http://www.example.com/about_us | http | www.example.com | /about_us | | | 
 https://www.example.com/page=1 | https | www.example.com | /page=1 | | |
+
+Then we can choose *netloc* as domain to restrict graph scope:
+* scrape_in
+* scrape_out
+* scrape_all
