@@ -6,6 +6,7 @@ The author is not responsible for the use that users may give to this program,
 being exempt from any execution and damage that third parties may cause.
 The content displayed on the websites is the exclusive property of their authors. 
 The fact of showing it in this project is for didactic purposes only.
+Missuse of this code may result in a [DDoS attack](https://es.wikipedia.org/wiki/Ataque_de_denegaci%C3%B3n_de_servicio)
 
 # Required libraries
 
