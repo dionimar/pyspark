@@ -54,7 +54,7 @@ Take care of table size: more registers requires more time (increase __ELASTIC_F
   hrefs = [href['href'] for href in content.find_all(href = True)] # List of all href labels
   return list(set([href for href in hrefs if netloc in href]))     # Returns the minimal list of hrefs which contains its domain
 ```
-Refer to [BeautifulSoup](https://www.crummy.com/software/BeautifulSoup/ for further reading of BeautifulSoup).
+Refer to [BeautifulSoup](https://www.crummy.com/software/BeautifulSoup/) for further reading.
 
 # Main functionality
 
