@@ -86,3 +86,13 @@ nx.draw_spring(
   node_color  = list(colors)
 )
 ```
+
+
+# Issues
+
+There is an issue with url naming: all urls are mapped to its path for naming, which yields an error:
+path for the next urls match, so appears as a single cluster in the graph
+www.example.com/ --->>> /
+www.domain.com/  --->>> /
+
+Please, contribute and fix it! 
