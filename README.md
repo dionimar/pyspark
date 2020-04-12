@@ -39,7 +39,7 @@ url | scheme | netloc | path | parameters | query | fragment
 http://www.example.com/about_us | http | www.example.com | /about_us | | | 
 https://www.example.com/page=1 | https | www.example.com | /page=1 | | |
 
-You can read more about url parsing in https://docs.python.org/3/library/urllib.parse.html#module-urllib.parse.
+You can read more about url parsing in [urllib](https://docs.python.org/3/library/urllib.parse.html#module-urllib.parse).
 
 Then we can choose *netloc* as domain to restrict graph scope, which is  done in scrape_ functions:
 ```python
@@ -54,7 +54,7 @@ Take care of table size: more registers requires more time (increase __ELASTIC_F
   hrefs = [href['href'] for href in content.find_all(href = True)] # List of all href labels
   return list(set([href for href in hrefs if netloc in href]))     # Returns the minimal list of hrefs which contains its domain
 ```
-Refer to https://www.crummy.com/software/BeautifulSoup/ for further reading of BeautifulSoup.
+Refer to [BeautifulSoup](https://www.crummy.com/software/BeautifulSoup/ for further reading of BeautifulSoup).
 
 # Main functionality
 
