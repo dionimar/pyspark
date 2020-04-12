@@ -12,16 +12,34 @@ import matplotlib.pyplot as plt
 
 
 '''
-Es muy importante hacer las peticiones a las webs de forma gradual y sin concentrar
-las peticiones en un periodo corto de tiempo. Por ello, usamos un sleep en cada
-llamada a la funcion que hace peticiones.
-En caso de no poner esta restriccion, estariamos saturando la web de un modo similar
-a como se hacen los ataques DDoS. 
-El usuario es el unico responsable de cómo use este código.
+It is very important to make requests to the websites gradually and without concentrating
+requests in a short period of time. Therefore, we use a sleep in each
+requests function.
+In case of not putting this restriction, we would be saturating the web in a similar way
+to how DDoS attacks are made.
+The user is solely responsible for how they use this code.
 '''
-__ELASTIC_FACTOR__ = 5
 
 
+__ELASTIC_FACTOR = 5
+
+
+'''
+urllib.parse.urlparse (parsing method for url's) returns a tuple with the following
+fields. You can see it in a pyton shell:
+
+>>> from urllib.parse import urlparse
+>>> urlparse('https://docs.python.org/3/library/urllib.parse.html#module-urllib.parse')
+ParseResult(
+    scheme='https', 
+    netloc='docs.python.org', 
+    path='/3/library/urllib.parse.html', 
+    params='', 
+    query='',  
+    fragment='module-urllib.parse'
+)
+
+'''
 url_struct = StructType([
     StructField('scheme',     StringType()),
     StructField('netloc',     StringType()),
@@ -33,10 +51,18 @@ url_struct = StructType([
 
 def url_parse_(url):
     return urlparse(url)
-url_parse = udf(url_parse_, url_struct)
+url_parse = udf(url_parse_, url_struct) # Define the output format
 
+
+'''
+Next three functions main goal is to download the html content of an url and
+extract the href labels for further processing.
+scrape_in_  -> drops non domain related hrefs,
+scrape_out_ -> drops domain related hrefs and
+scrap_all_  -> does not drop anything.
+'''
 def scrape_in_(netloc, url):
-    time.sleep(random.random()*__ELASTIC_FACTOR__) 
+    time.sleep(random.random()*__ELASTIC_FACTOR) 
     try:
         content = requests.get(url)
         content = BeautifulSoup(content.text, 'lxml')
@@ -46,7 +72,7 @@ def scrape_in_(netloc, url):
         return []
 
 def scrape_out_(netloc, url):
-    time.sleep(random.random()*__ELASTIC_FACTOR__) 
+    time.sleep(random.random()*__ELASTIC_FACTOR) 
     try:
         content = requests.get(url)
         content = BeautifulSoup(content.text, 'lxml')
@@ -56,7 +82,7 @@ def scrape_out_(netloc, url):
         return []
 
 def scrape_all_(netloc, url):
-    time.sleep(random.random()*__ELASTIC_FACTOR__) 
+    time.sleep(random.random()*__ELASTIC_FACTOR) 
     try:
         content = requests.get(url)
         content = BeautifulSoup(content.text, 'lxml')
@@ -65,6 +91,7 @@ def scrape_all_(netloc, url):
     except:
         return []
 
+# All functions return a single array with href links.
 scrape_in  = udf(scrape_in_,  ArrayType(StringType()))
 scrape_out = udf(scrape_out_, ArrayType(StringType()))
 scrape_all = udf(scrape_all_, ArrayType(StringType()))
@@ -106,8 +133,43 @@ def expand(previous, previous_info):
 
 
 
+def acquire_data(spark, seedlist, filename_out):
+    # Read the seed list (list of inital domains)
+    urls = spark.read.json(seedlist)
+    # Parse all url (extract domain, http(s),...)
+    master_info = urls \
+        .withColumn('info', url_parse('url')) \
+        .select(
+            'url',
+            'info.scheme',
+            'info.netloc',
+            'info.path',
+            'info.parameters',
+            'info.query',
+            'info.fragment'
+        )
+    
+    master_info.show()
 
-
+    # Join our urls with netloc (domain) from master_info (scrape_** needs a domain)
+    urls = urls \
+        .join(
+        master_info.select('url', 'netloc'),
+            on = ['url'],
+            how = 'left'
+        ) \
+        .withColumn('href', explode_outer(scrape_in('netloc', 'url')))
+    urls.show(truncate = False)
+    
+    # One level expansion (following hrefs)
+    master, master_info = expand(urls, master_info)
+    master.show(n = 1000, truncate = False)
+    master_info.show(n = 1000, truncate = False)
+    # Save the data. We recommend to save it once its been properlly downloaded
+    # That way you don't saturate the net
+    master.write.format('json').save(filename_out)
+    master_info.write.format('json').save(filename_out + '_info')
+    return master, master_info
 
 
 
@@ -115,51 +177,24 @@ def expand(previous, previous_info):
 
 if __name__ == '__main__':
     with SparkSession.builder.master('local[4]').getOrCreate() as spark:
-        # urls = spark.read.json('urls.json')
-        # urls.show()
-
-        # master_info = urls \
-        #     .withColumn('info', url_parse('url')) \
-        #     .select(
-        #         'url',
-        #         'info.scheme',
-        #         'info.netloc',
-        #         'info.path',
-        #         'info.parameters',
-        #         'info.query',
-        #         'info.fragment'
-        #     )
-
-        # master_info.show()
-
-        # urls = urls \
-        #     .join(
-        #         master_info.select('url', 'netloc'),
-        #         on = ['url'],
-        #         how = 'left'
-        #     ) \
-        #     .withColumn('href', explode_outer(scrape_in('netloc', 'url')))
         
-        # urls.show(truncate = False)
+        master, master_info = acquire_data(
+            spark,
+            seedlist = 'urls.json',
+            filename_out = 'master'
+        )
+
+        ## In case you saved the data, read it:
+        # master = spark.read.json('master')
+        # master_info = spark.read.json('master_info')
 
 
-        
-        # master, master_info = expand(urls, master_info)
-        # master.show(n = 1000, truncate = False)
-        # master_info.show(n = 1000, truncate = False)
-
-        # master.write.format('json').save('master')
-        # master_info.write.format('json').save('master_info')
-        
-        master = spark.read.json('master')
-        master_info = spark.read.json('master_info')
-        
-        #master.show()
-
+        # Create nodes and edges from url and href columns
         nodes = master \
             .select('url') \
             .dropDuplicates()
 
+        # All nodes cames from 'url' and 'href' columns.
         nodes = nodes \
             .union(master \
                    .select('href') \
@@ -176,15 +211,7 @@ if __name__ == '__main__':
             .map(lambda x: (x['url'], x['href'])) \
             .collect()
 
-
-        # Now create a graph and plot it
-        G = nx.Graph()
-        G.add_nodes_from(nodes)
-        G.add_edges_from(edges)
-        
-        print(G.number_of_nodes())
-        print(G.number_of_edges())
-
+        # We set the url path as node name.
         node_info_list = master_info \
             .select('url', 'path') \
             .rdd
@@ -197,13 +224,16 @@ if __name__ == '__main__':
             .map(lambda x: x['path']) \
             .collect()
 
+        # Now create a graph and plot it
+        G = nx.Graph()
+        G.add_nodes_from(nodes)
+        G.add_edges_from(edges)
         
+        print(G.number_of_nodes())
+        print(G.number_of_edges())
+
         node_info = dict(zip(node_url, node_path))
-
         colors = nx.degree_centrality(G).values()
-
-        
-        
         nx.draw_spring(
             G,
             with_labels = True,
@@ -215,5 +245,4 @@ if __name__ == '__main__':
             width = 0.1,
             node_color = list(colors)
         )
-        
         plt.show()
