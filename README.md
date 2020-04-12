@@ -92,7 +92,13 @@ nx.draw_spring(
 
 There is an issue with url naming: all urls are mapped to its path for naming, which yields an error:
 path for the next urls match, so appears as a single cluster in the graph
-www.example.com/ --->>> /
-www.domain.com/  --->>> /
+* www.example.com/ --->>> /
+* www.domain.com/  --->>> /
 
-Please, contribute and fix it! 
+All your ideas for solving the issue are welcome!
+Feel free to do whatever you want with the code, it's been done with sharing and freedom in mind.
+
+
+# Contact
+Contact me at dnmrtnz94 [at] gmail.
+Thanks for reading!!
