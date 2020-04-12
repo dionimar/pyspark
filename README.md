@@ -1,4 +1,4 @@
-Disclousure
+## Disclousure
 This little project is intended to show uncommon examples of pyspark.
 The web pages used in the project are merely examples, 
 with no intention of causing damage or misuse of its services. 
@@ -7,10 +7,7 @@ being exempt from any execution and damage that third parties may cause.
 The content displayed on the websites is the exclusive property of their authors. 
 The fact of showing it in this project is for didactic purposes only.
 
-# pyspark
-
-Some little examples using Spark.
-
+# How data looks like
 
 We are going to construct a table with the next structure:
 
@@ -38,3 +35,10 @@ Then we can choose *netloc* as domain to restrict graph scope:
 * scrape_in
 * scrape_out
 * scrape_all
+
+
+# Main functionality
+
+Once we have the first table (url, href) we can construct a new table with previous href as url, and scrape the new urls to obtain its hrefs. We can repeat it as much as we want, so growing the graph. 
+As said before, we have the pairs (url, href) which are in fact edges from a directed graph, with all url's and href's as nodes.
+That's what we do in the **main** function.
