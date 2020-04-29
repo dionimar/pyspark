@@ -46,10 +46,10 @@ Then we can choose *netloc* as domain to restrict graph scope, which is  done in
 ```python
 def scrape_in_(netloc, url):
 '''
-Random sleep for distribute requests over time (avoid DDoS)
+Random sleep for distributing requests over time (avoid DDoS)
 Take care of table size: more registers requires more time (increase __ELASTIC_FACTOR)
 '''
-  time.sleep(random.random() * __ELASTIC_FACTOR
+  time.sleep(random.random() * __ELASTIC_FACTOR)
   content = requests.get(url)                                      # Get html code from url
   content = BeautifulSoup(content.text, 'lxml')                    # Parse html content. Tree representation from labels.
   hrefs = [href['href'] for href in content.find_all(href = True)] # List of all href labels
@@ -93,8 +93,8 @@ nx.draw_spring(
 
 There is an issue with url naming: all urls are mapped to its path for naming, which yields an error:
 path for the next urls match, so appears as a single cluster in the graph
-* www.example.com/ --->>> /
-* www.domain.com/  --->>> /
+* www.example.com/ ---> /
+* www.domain.com/  ---> /
 
 All your ideas for solving the issue are welcome!
 Feel free to do whatever you want with the code, it's been done with sharing and freedom in mind.
