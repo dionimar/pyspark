@@ -49,9 +49,8 @@ url_struct = StructType([
     StructField('fragment',   StringType())
 ])
 
-def url_parse_(url):
-    return urlparse(url)
-url_parse = udf(url_parse_, url_struct) # Define the output format
+
+url_parse = udf(urlparse, url_struct) # Define the output format
 
 
 '''
@@ -178,11 +177,11 @@ def acquire_data(spark, seedlist, filename_out):
 if __name__ == '__main__':
     with SparkSession.builder.master('local[4]').getOrCreate() as spark:
         
-        # master, master_info = acquire_data(
-        #     spark,
-        #     seedlist = 'urls.json',
-        #     filename_out = 'master'
-        # )
+        master, master_info = acquire_data(
+            spark,
+            seedlist = 'urls.json',
+            filename_out = 'master'
+        )
 
         ## In case you saved the data, read it:
         master = spark.read.json('master')
